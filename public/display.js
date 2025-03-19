@@ -1,13 +1,13 @@
 let messages = [];
 let fadeValues = []; 
-const maxMessages = 8; 
+const maxMessages = 20; 
 let fadeSpeed = 2; 
 let baseAlpha = 180; 
 let clearing = false;
 let socket;
 
 function setup() {
-    createCanvas(600, 400);
+    createCanvas(1080, 1920);
     background(0);
     textSize(18);
     fill(255);
