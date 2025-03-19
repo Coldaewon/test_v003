@@ -1,40 +1,88 @@
 let nameInput, messageInput, submitButton;
-let socket;
+let logoImg;
+
+function preload() {
+    logoImg = loadImage("ATMOS_logo.png"); 
+}
 
 function setup() {
-    createCanvas(400, 300);
-    background(220);
+    createCanvas(1920, 1080);
+    background(255); 
     
-    textSize(16);
-    textAlign(CENTER);
-    text("방명록을 남겨주세요!", width / 2, 30);
+
+    textSize(60);
+    fill(0); 
+    textAlign(CENTER, CENTER);
+    text("Re:spire(inspire)", width / 2, 150);
     
+
+    textSize(32);
+    text("방명록을 남겨주세요!", width / 2, 250);
+
+
     nameInput = createInput();
-    nameInput.position(100, 60);
-    nameInput.size(200);
-    nameInput.attribute("placeholder", "이름 입력");
+    nameInput.position(width / 2 - 150, 350);
+    nameInput.size(300, 40);
+    nameInput.style("font-size", "18px");
+    nameInput.style("padding", "5px");
 
+  
     messageInput = createInput();
-    messageInput.position(100, 100);
-    messageInput.size(200);
-    messageInput.attribute("placeholder", "메시지 입력");
+    messageInput.position(width / 2 - 150, 420);
+    messageInput.size(300, 40);
+    messageInput.style("font-size", "18px");
+    messageInput.style("padding", "5px");
 
-    submitButton = createButton("등록");
-    submitButton.position(160, 140);
+   
+    submitButton = createButton("전송");
+    submitButton.position(width / 2 - 50, 500);
+    submitButton.size(100, 50);
+    submitButton.style("font-size", "20px");
+    submitButton.style("background", "black");
+    submitButton.style("color", "white");
+    submitButton.style("border", "none");
+    submitButton.style("cursor", "pointer");
+
+   
+    submitButton.mouseOver(() => {
+        submitButton.style("opacity", "0.7");
+        submitButton.style("transform", "scale(1.05)");
+    });
+
+    submitButton.mouseOut(() => {
+        submitButton.style("opacity", "1");
+        submitButton.style("transform", "scale(1)");
+    });
+
     submitButton.mousePressed(sendMessage);
+}
 
-    socket = new WebSocket("ws://localhost:8080"); // WebSocket 서버 연결
+function draw() {
+    background(255); 
+    
+    
+    fill(0);
+    textSize(60);
+    text("Re:spire(inspire)", width / 2, 150);
+    
+    textSize(32);
+    text("방명록을 남겨주세요!", width / 2, 250);
+
+    
+    image(logoImg, width / 2 - logoImg.width / 6, height - 150, logoImg.width / 3, logoImg.height / 3);
 }
 
 function sendMessage() {
-    const name = nameInput.value();
-    const message = messageInput.value();
+    let name = nameInput.value();
+    let message = messageInput.value();
 
     if (name && message) {
         const data = { name, message };
-        socket.send(JSON.stringify(data)); // 메시지 전송
+        console.log("메시지 전송:", data);
 
-        // 입력 필드 초기화
+        
+        socket.send(JSON.stringify(data));
+
         nameInput.value('');
         messageInput.value('');
     }
