@@ -1,53 +1,59 @@
 let nameInput, messageInput, submitButton;
-let logoImg;
-let socket; // WebSocket 변수 추가
+let bgImg;
+let socket;
 
 function preload() {
-    logoImg = loadImage("assets/ATMOS_logo.png"); // 로고 이미지 로드
+    // ✅ 배경 이미지 파일이 `public/` 폴더에 있는지 확인 후 올바른 경로로 설정
+    bgImg = loadImage("index.png", () => {
+        console.log("✅ 배경 이미지 로드 성공!");
+    }, () => {
+        console.error("❌ 배경 이미지 로드 실패! 경로를 확인하세요.");
+    });
 }
 
 function setup() {
     createCanvas(1920, 1080);
-    background(255); // 배경을 흰색으로 설정
-    
-    // WebSocket 서버 연결
+    background(255);
+
+    // ✅ WebSocket 서버 연결
     socket = new WebSocket("ws://localhost:8080");
 
     socket.addEventListener("open", () => {
         console.log("✅ WebSocket 연결 성공!");
     });
 
-    socket.addEventListener("error", (error) => {
-        console.error("❌ WebSocket 연결 오류:", error);
+    socket.addEventListener("message", (event) => {
+        event.data.text().then((text) => {
+            const data = JSON.parse(text);
+            console.log("📩 받은 메시지:", data);
+        }).catch((err) => {
+            console.error("❌ JSON 변환 오류:", err);
+        });
     });
 
-    // 타이틀 텍스트
-    textSize(60);
-    fill(0);
-    textAlign(CENTER, CENTER);
-    text("Re:spire(inspire)", width / 2, 150);
-    
-    // 설명 문구 (입력창과 중앙에 맞추기)
-    textSize(32);
-    text("방명록을 남겨주세요!", width / 2, height / 2 - 150);
-
-    // 입력창 (이름)
+    // ✅ 입력창 (이름)
     nameInput = createInput();
-    nameInput.position(width / 2 - 150, height / 2 - 80);
+    nameInput.position(width / 2 - 150, height / 2 - 50);
     nameInput.size(300, 40);
     nameInput.style("font-size", "18px");
-    nameInput.style("padding", "5px");
+    nameInput.style("padding", "10px");
+    nameInput.style("border", "2px solid black");
+    nameInput.style("background", "rgba(255, 255, 255, 0.8)");
+    nameInput.style("color", "black");
 
-    // 입력창 (메시지)
+    // ✅ 입력창 (메시지)
     messageInput = createInput();
-    messageInput.position(width / 2 - 150, height / 2 - 20);
+    messageInput.position(width / 2 - 150, height / 2 + 10);
     messageInput.size(300, 40);
     messageInput.style("font-size", "18px");
-    messageInput.style("padding", "5px");
+    messageInput.style("padding", "10px");
+    messageInput.style("border", "2px solid black");
+    messageInput.style("background", "rgba(255, 255, 255, 0.8)");
+    messageInput.style("color", "black");
 
-    // 전송 버튼
+    // ✅ 전송 버튼
     submitButton = createButton("전송");
-    submitButton.position(width / 2 - 50, height / 2 + 50);
+    submitButton.position(width / 2 - 50, height / 2 + 80);
     submitButton.size(100, 50);
     submitButton.style("font-size", "20px");
     submitButton.style("background", "black");
@@ -55,7 +61,6 @@ function setup() {
     submitButton.style("border", "none");
     submitButton.style("cursor", "pointer");
 
-    // 버튼 애니메이션 효과 추가
     submitButton.mouseOver(() => {
         submitButton.style("opacity", "0.7");
         submitButton.style("transform", "scale(1.05)");
@@ -70,22 +75,14 @@ function setup() {
 }
 
 function draw() {
-    background(255); // 흰 배경 유지
-    
-    // 텍스트 다시 그리기
-    fill(0);
-    textSize(60);
-    text("Re:spire(inspire)", width / 2, 150);
-    
-    textSize(32);
-    text("방명록을 남겨주세요!", width / 2, height / 2 - 150);
-
-    // 로고 이미지가 로드되었을 때만 표시
-    if (logoImg) {
-        image(logoImg, width / 2 - logoImg.width / 6, height - 150, logoImg.width / 3, logoImg.height / 3);
+    if (bgImg) {
+        background(bgImg); // ✅ 배경이 정상적으로 로드되면 표시
     } else {
-        textSize(20);
-        text("로고 로드 중...", width / 2, height - 100);
+        background(255); // ✅ 이미지가 없을 경우 흰 배경 유지
+        textSize(32);
+        fill(0);
+        textAlign(CENTER, CENTER);
+        text("🔄 Loading...", width / 2, height / 2);
     }
 }
 
@@ -97,12 +94,9 @@ function sendMessage() {
         const data = { name, message };
         console.log("📩 전송할 메시지:", data);
 
-        // WebSocket 연결 상태 확인 후 전송
         if (socket.readyState === WebSocket.OPEN) {
             socket.send(JSON.stringify(data));
             console.log("✅ 메시지가 서버로 전송됨!");
-
-            // 입력 필드 초기화
             nameInput.value('');
             messageInput.value('');
         } else {
