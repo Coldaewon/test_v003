@@ -4,7 +4,7 @@ let socket;
 
 function preload() {
     // ✅ 배경 이미지 파일이 `public/` 폴더에 있는지 확인 후 올바른 경로로 설정
-    bgImg = loadImage("index.png", () => {
+    bgImg = loadImage("assets/index.png", () => {
         console.log("✅ 배경 이미지 로드 성공!");
     }, () => {
         console.error("❌ 배경 이미지 로드 실패! 경로를 확인하세요.");
